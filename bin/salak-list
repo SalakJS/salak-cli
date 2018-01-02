@@ -1,0 +1,48 @@
+#!/usr/bin/env node
+
+const program = require('commander')
+const chalk = require('chalk')
+const config = require('../config')
+const { getTemplatesDesc } = require('../lib/download')
+const getLocalConfig = require('../lib/localConfig')
+
+const { tmp, official, homeConf } = config
+
+const gitRepo = getLocalConfig(homeConf).repo || official
+
+program
+  .option('-u, --update', 'find online templates')
+
+// 帮助
+program.on('--help', () => {
+  console.log('  Examples:')
+  console.log()
+  console.log(chalk.gray('    # list all avaiable templates'))
+  console.log('    $ salak list')
+  console.log()
+  console.log(chalk.gray('    # list all avaiable templates from online'))
+  console.log('    $ salak list -u')
+  console.log()
+})
+
+program.parse(process.argv)
+
+console.log()
+process.on('exit', () => {
+  console.log()
+})
+
+getTemplatesDesc(gitRepo, tmp, !program.update).then((templates) => {
+  const keys = Object.keys(templates)
+
+  console.log('  Available templates:')
+  console.log()
+  keys.forEach((key) => {
+    console.log(
+      '  ' + chalk.yellow('★') +
+      '  ' + chalk.blue(key) +
+      ' - ' + templates[key])
+  })
+}).catch((err) => {
+  console.log(chalk.red(err && err.message))
+})

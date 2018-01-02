@@ -1,0 +1,102 @@
+#!/usr/bin/env node
+
+const program = require('commander')
+const chalk = require('chalk')
+const fs = require('fs')
+const path = require('path')
+const inquirer = require('inquirer')
+const generate = require('../lib/generate')
+const config = require('../config')
+const { getTemplatePath } = require('../lib/download')
+const getLocalConfig = require('../lib/localConfig')
+const { tmp, official, homeConf } = config
+const gitRepo = getLocalConfig(homeConf).repo || official
+
+program
+  .usage('<template-name> [project-name]')
+  .option('-d, --dir [dirname]', 'local template dir')
+  .option('-u, --update', 'force updating template')
+
+console.log()
+process.on('exit', () => {
+  console.log()
+})
+
+// 帮助
+program.on('--help', () => {
+  console.log('  Examples:')
+  console.log()
+  console.log(chalk.gray('    # create a new project with an official template'))
+  console.log('    $ salak init simple my-project')
+  console.log()
+  console.log(chalk.gray('    # create a new project straight from a local template'))
+  console.log('    $ salak init -d /template-dir my-project')
+  console.log()
+})
+
+function help () {
+  program.parse(process.argv)
+  if (!program.dir && program.args.length < 1) {
+    return program.help()
+  }
+}
+
+help()
+
+// 设置
+let template = program.args[0]
+let rawName = program.args[1]
+// 本地文件
+const localDir = program.dir && path.resolve(program.dir)
+
+// 采用本地模板，第一个参数即为目录
+if (localDir && fs.existsSync(localDir)) {
+  rawName = program.args[0]
+}
+
+const inPlace = !rawName || rawName === '.'
+const name = inPlace ? path.relative('../', process.cwd()) : rawName
+const to = path.resolve(rawName || '.')
+const useCache = !program.update
+
+async function run () {
+  try {
+    let templateDir
+    // 使用本地模板
+    if (localDir && fs.existsSync(localDir)) {
+      templateDir = localDir
+    } else {
+      templateDir = await getTemplatePath(gitRepo, tmp, template, useCache)
+    }
+
+    // 解析模板
+    await generate(name, templateDir, to)
+
+    console.log(chalk.green('Done! Enjoy it.'))
+    console.log()
+
+    if (!inPlace) {
+      console.log(chalk.green(`$ cd ${rawName}`))
+    }
+    console.log(chalk.green('$ npm install'))
+  } catch (err) {
+    console.log(chalk.red(err && err.message || 'Error, please try again.'))
+    process.exit(1)
+  }
+}
+
+if (fs.existsSync(to)) {
+  inquirer.prompt([{
+    type: 'confirm',
+    message: inPlace ? 'Generate project in current directory ?' : 'Target directory exists. Continue ?',
+    name: 'ok'
+  }]).then(answers => {
+    if (answers.ok) {
+      run()
+    }
+  }).catch((err) => {
+    console.log(chalk.red(err && err.message))
+  })
+} else {
+  run()
+}

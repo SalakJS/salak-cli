@@ -1,0 +1,50 @@
+#!/usr/bin/env node
+
+const program = require('commander')
+const chalk = require('chalk')
+const fs = require('fs')
+const path = require('path')
+const config = require('../config')
+const getLocalConfig = require('../lib/localConfig')
+
+program
+  .usage('[key] [value]')
+
+program.on('--help', () => {
+  console.log('  Examples:')
+  console.log()
+  console.log(chalk.gray('    # set templates repo'))
+  console.log('    $ salak set repo SalakJS/templates')
+  console.log()
+  console.log(chalk.gray('    # set templates from private, remove git@ and .git'))
+  console.log('    $ salak set repo git.xxx:username/repo')
+  console.log()
+})
+
+function help () {
+  program.parse(process.argv)
+  if (program.args.length < 2) {
+    return program.help()
+  }
+}
+
+console.log()
+process.on('exit', () => {
+  console.log()
+})
+
+help()
+
+const key = program.args[0]
+const value = program.args[1]
+const { homeConf } = config
+
+const localConfig = getLocalConfig(homeConf)
+
+localConfig[key] = value
+
+const str = JSON.stringify(localConfig, null, 2).replace(/"/g, '\'')
+
+fs.writeFileSync(homeConf, 'module.exports = ' + str)
+
+console.log(chalk.green(`  Success! Set ${key} ${value}`))

@@ -1,6 +1,6 @@
 {
   "name": "salak-cli",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A simple CLI for scaffolding Salak applications.",
   "main": "index.js",
   "bin": {

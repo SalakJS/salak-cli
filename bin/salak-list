@@ -12,6 +12,7 @@ const gitRepo = getLocalConfig(homeConf).repo || official
 
 program
   .option('-u, --update', 'find online templates')
+  .option('-c, --clone', 'use git clone')
 
 // 帮助
 program.on('--help', () => {
@@ -32,7 +33,7 @@ process.on('exit', () => {
   console.log()
 })
 
-getTemplatesDesc(gitRepo, tmp, !program.update).then((templates) => {
+getTemplatesDesc(gitRepo, tmp, !program.update, !!program.clone).then((templates) => {
   const keys = Object.keys(templates)
 
   console.log('  Available templates:')

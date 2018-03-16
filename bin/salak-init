@@ -16,6 +16,7 @@ program
   .usage('<template-name> [project-name]')
   .option('-d, --dir [dirname]', 'local template dir')
   .option('-u, --update', 'force updating template')
+  .option('-c, --clone', 'use git clone')
 
 console.log()
 process.on('exit', () => {
@@ -66,7 +67,7 @@ async function run () {
     if (localDir && fs.existsSync(localDir)) {
       templateDir = localDir
     } else {
-      templateDir = await getTemplatePath(gitRepo, tmp, template, useCache)
+      templateDir = await getTemplatePath(gitRepo, tmp, template, useCache, !!program.clone)
     }
 
     // 解析模板

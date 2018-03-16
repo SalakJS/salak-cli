@@ -66,6 +66,8 @@ If you use in your private repo, you must remove the git@ and .git, such as:
 $ salak set repo git.xxx:username/repo
 ```
 
+tip: you must use options '--clone' when you use private repo.
+
 ## License
 
 MIT

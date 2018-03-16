@@ -17,6 +17,7 @@ program
   .option('-d, --dir [dirname]', 'local template dir')
   .option('-u, --update', 'force updating template')
   .option('-c, --clone', 'use git clone')
+  .option('-q, --quick', 'use default option')
 
 console.log()
 process.on('exit', () => {
@@ -71,7 +72,7 @@ async function run () {
     }
 
     // 解析模板
-    await generate(name, templateDir, to)
+    await generate(name, templateDir, to, !!program.quick)
 
     console.log(chalk.green('Done! Enjoy it.'))
     console.log()

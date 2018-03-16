@@ -36,6 +36,7 @@ Quick to create project.
 ```bash
 $ salak init [template] [project-name]
 $ salak init [template] [project-name] -u # force updating templates
+$ salak init [template] [project-name] -q # quick create project with default options
 $ salak init -d /template-dir [project-name] # create project from local template
 ```
 

@@ -37,6 +37,7 @@ Quick to create project.
 $ salak init [template] [project-name]
 $ salak init [template] [project-name] -u # force updating templates
 $ salak init [template] [project-name] -q # quick create project with default options
+$ salak init [template] [project-name] -p '{"name":"salak","author":"title"}' # the same as quick，provide default options，it must be include name and author key.
 $ salak init -d /template-dir [project-name] # create project from local template
 ```
 

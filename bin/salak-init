@@ -15,6 +15,7 @@ const gitRepo = getLocalConfig(homeConf).repo || official
 program
   .usage('<template-name> [project-name]')
   .option('-d, --dir [dirname]', 'local template dir')
+  .option('-p, --params [params]', 'template default params')
   .option('-u, --update', 'force updating template')
   .option('-c, --clone', 'use git clone')
   .option('-q, --quick', 'use default option')
@@ -61,6 +62,17 @@ const name = inPlace ? path.relative('../', process.cwd()) : rawName
 const to = path.resolve(rawName || '.')
 const useCache = !program.update
 
+let params
+
+if (program.params) {
+  try {
+    params = JSON.parse(program.params)
+    if (!params.author || !params.name) {
+      params = null
+    }
+  } catch (err) {}
+}
+
 async function run () {
   try {
     let templateDir
@@ -72,7 +84,7 @@ async function run () {
     }
 
     // 解析模板
-    await generate(name, templateDir, to, !!program.quick)
+    await generate(name, templateDir, to, !!program.quick, params)
 
     console.log(chalk.green('Done! Enjoy it.'))
     console.log()
